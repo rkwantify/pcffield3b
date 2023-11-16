@@ -2,6 +2,7 @@ import { IInputs, IOutputs } from "./generated/ManifestTypes";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { PCFFieldControl } from "./components/PCFFieldControl";
+import { TextField } from "@fluentui/react";
 
 export class pcffield3
   implements ComponentFramework.StandardControl<IInputs, IOutputs>
@@ -30,7 +31,7 @@ export class pcffield3
     state: ComponentFramework.Dictionary,
     container: HTMLDivElement
   ): void {
-    console.log("xxx init");
+    console.log("init");
     this.context = context;
     this.container = container;
     ReactDOM.render(React.createElement(PCFFieldControl, {}), this.container);
@@ -46,11 +47,10 @@ export class pcffield3
    * @param context The entire property bag available to control via Context Object; It contains values as set up by the customizer mapped to names defined in the manifest, as well as utility functions
    */
   public updateView(context: ComponentFramework.Context<IInputs>): void {
-    console.log(
-      `xxx updateView() called (property bag changed); context.parameters`,
-      context.parameters
-    );
+    console.log(`updateView() called (property bag changed)`);
+
     this.context = context;
+    const value = this.context.parameters.textField.raw;
     ReactDOM.render(React.createElement(PCFFieldControl, {}), this.container);
   }
 
