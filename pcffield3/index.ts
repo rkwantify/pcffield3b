@@ -11,6 +11,7 @@ export class pcffield3
   container: HTMLDivElement;
   textInput: HTMLInputElement;
   notifyOutputChanged: () => void;
+  textValue: string | null;
 
   /**
    * Empty constructor.
@@ -31,14 +32,15 @@ export class pcffield3
     state: ComponentFramework.Dictionary,
     container: HTMLDivElement
   ): void {
-    console.log("init");
     this.context = context;
     this.container = container;
-    ReactDOM.render(React.createElement(PCFFieldControl, {}), this.container);
+    this.notifyOutputChanged = notifyOutputChanged;
+    this.render();
   }
 
-  onTextBlur = (): void => {
+  onTextBlur = (newValue: string | null): void => {
     console.log("calling notifyOutputChanged() from onTextBlur()");
+    this.textValue = newValue;
     this.notifyOutputChanged();
   };
 
@@ -48,10 +50,30 @@ export class pcffield3
    */
   public updateView(context: ComponentFramework.Context<IInputs>): void {
     console.log(`updateView() called (property bag changed)`);
-
     this.context = context;
+    this.render();
+  }
+
+  public render(): void {
     const value = this.context.parameters.textField.raw;
-    ReactDOM.render(React.createElement(PCFFieldControl, {}), this.container);
+    let readOnly = this.context.mode.isControlDisabled;
+    const security = this.context.parameters.textField.security;
+    let masked = false;
+
+    if (security) {
+      readOnly = readOnly || !security.editable;
+      masked = !security.readable;
+    }
+
+    ReactDOM.render(
+      React.createElement(PCFFieldControl, {
+        value: value ?? null,
+        onChange: this.onTextBlur,
+        readOnly: readOnly,
+        masked: masked,
+      }),
+      this.container
+    );
   }
 
   /**
@@ -59,10 +81,9 @@ export class pcffield3
    * @returns an object based on nomenclature defined in manifest, expecting object[s] for property marked as “bound” or “output”
    */
   public getOutputs(): IOutputs {
-    console.log("getOutputs() called, textInput.value:", this.textInput.value);
-
+    console.log("getOutputs() called, this.textValue:", this.textValue);
     return {
-      textField: this.textInput.value,
+      textField: this.textValue ?? undefined,
     };
   }
 
