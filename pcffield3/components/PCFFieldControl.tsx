@@ -1,57 +1,52 @@
 import * as React from "react";
-import { TextField } from "@fluentui/react";
+import { ServiceProvider } from "pcf-react";
+import { CompositeControlVM } from "../viewmodels/CompositeControlVM";
+import { Stack } from "@fluentui/react";
+import { TextInput } from "./pcf-fluent-ui/TextInput";
+import { OptionSetInput } from "./pcf-fluent-ui/OptionSetInput";
+import { ServiceProviderContext } from "./context";
+import { observer } from "mobx-react";
 
-export interface TextInputProps {
-  value: string | null;
-  onChange: (newValue: string | null) => void;
-  readOnly?: boolean;
-  masked?: boolean;
+export interface PCFFieldControlProps {
+  controlWidth?: number;
+  controlHeight?: number;
+  serviceProvider: ServiceProvider;
 }
-export interface TextInputState {
-  textValue: string;
-}
 
-export class PCFFieldControl extends React.Component<
-  TextInputProps,
-  TextInputState
-> {
-  private isEditing = false;
+export class PCFFieldControl extends React.Component<PCFFieldControlProps> {
+  vm: CompositeControlVM;
 
-  constructor(props: TextInputProps) {
+  constructor(props: PCFFieldControlProps) {
     super(props);
-    this.state = {
-      textValue: props.value ?? "",
-    };
+    this.vm = props.serviceProvider.get<CompositeControlVM>("ViewModel");
   }
 
-  onChange = (_event: unknown, newValue?: string | undefined): void => {
-    this.isEditing = true;
-    this.setState({
-      textValue: newValue || "",
-    });
-  };
-
-  onBlur = (): void => {
-    if (!this.isEditing) return;
-    this.isEditing = false;
-    if (this.props.onChange) this.props.onChange(this.state.textValue);
-  };
-
-  render(): JSX.Element {
-    const { textValue } = this.state;
-    const { value, readOnly, masked } = this.props;
-    return masked ? (
-      <strong>*****</strong>
-    ) : (
-      <>
-        <TextField
-          placeholder="---"
-          disabled={readOnly}
-          value={this.isEditing ? textValue : (value as string)}
-          onBlur={this.onBlur}
-          onChange={this.onChange}
-        ></TextField>
-      </>
+  render(): React.JSX.Element {
+    const {
+      textField,
+      onTextFieldChanged,
+      optionSetField,
+      onOptionSetFieldChanged,
+      optionSetFieldOptions,
+      optionSetFieldRequired,
+    } = this.vm;
+    return (
+      <ServiceProviderContext.Provider value={this.props.serviceProvider}>
+        <Stack>
+          <TextInput
+            value={textField}
+            onChange={onTextFieldChanged}
+          ></TextInput>
+          <OptionSetInput
+            value={optionSetField}
+            onChange={onOptionSetFieldChanged}
+            options={optionSetFieldOptions}
+            showBlank={!optionSetFieldRequired}
+          ></OptionSetInput>
+        </Stack>
+      </ServiceProviderContext.Provider>
     );
   }
 }
+
+observer(PCFFieldControl);
