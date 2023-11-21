@@ -15,6 +15,8 @@ export class CompositeControlVM {
   textField: string | null = null;
   optionSetField: number | null = null;
   optionSetFieldRequired: boolean;
+  isPopupVisible = false;
+  isFullScreen = false;
 
   constructor(serviceProvider: ServiceProvider) {
     this.serviceProvider = serviceProvider;
@@ -34,6 +36,10 @@ export class CompositeControlVM {
     this.optionSetFieldRequired =
       this.controlContext.getParameters<IInputs>().optionSetField.attributes
         ?.RequiredLevel == 2;
+
+    this.controlContext.onFullScreenModeChangedEvent.subscribe(
+      this.onToggleFullScreen
+    );
   }
 
   onInParametersChanged(
@@ -69,14 +75,41 @@ export class CompositeControlVM {
       textField: this.textField,
     });
   }
+
+  onShowPopup(): void {
+    this.isPopupVisible = true;
+    console.log("onShowPopup");
+  }
+  onDismissPopup(): void {
+    console.log("onDismissPopup");
+    this.isPopupVisible = false;
+  }
+
+  onToggleFullScreen(): void {
+    this.isPopupVisible = false;
+    this.isFullScreen = !this.isFullScreen;
+    this.controlContext.fullScreen(this.isFullScreen);
+  }
+  onFullScreenChanged(
+    context: ControlContextService,
+    fullscreen: boolean
+  ): void {
+    this.isFullScreen = fullscreen;
+  }
   // #endregion
 }
 
 decorate(CompositeControlVM, {
   textField: observable,
   optionSetField: observable,
+  isPopupVisible: observable,
   onLoad: action.bound,
   onOptionSetFieldChanged: action.bound,
   onTextFieldChanged: action.bound,
   onInParametersChanged: action.bound,
+  onShowPopup: action.bound,
+  onDismissPopup: action.bound,
+  isFullScreen: observable,
+  onFullScreenChanged: action.bound,
+  onToggleFullScreen: action.bound,
 });
