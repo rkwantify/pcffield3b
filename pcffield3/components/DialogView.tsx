@@ -13,9 +13,10 @@ export class DialogView extends React.Component {
   context!: React.ContextType<typeof ServiceProviderContext>;
   render(): React.JSX.Element {
     const dialogService = this.context.get<DialogService>("DialogService");
-    // if (dialogService.isOpen) {
-    //   throw new Error("Render crash");
-    // }
+    if (dialogService.isOpen) {
+      // simulate React component crashing
+      throw new Error("Render crash - simulate crash for Error Boundary");
+    }
     return (
       <Dialog
         dialogContentProps={{

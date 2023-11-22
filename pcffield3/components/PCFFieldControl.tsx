@@ -15,12 +15,19 @@ export interface PCFFieldControlProps {
   serviceProvider: ServiceProvider;
 }
 
+export interface PCFFieldControlState {
+  hasError: boolean;
+}
+
 const styles = mergeStyleSets({
   searchButton: {},
   callout: { width: 300, padding: "16px" },
 });
 
-export class PCFFieldControl extends React.Component<PCFFieldControlProps> {
+export class PCFFieldControl extends React.Component<
+  PCFFieldControlProps,
+  PCFFieldControlState
+> {
   vm: CompositeControlVM;
   dialogService: DialogService;
 
@@ -29,6 +36,15 @@ export class PCFFieldControl extends React.Component<PCFFieldControlProps> {
     this.vm = props.serviceProvider.get<CompositeControlVM>("ViewModel");
     this.dialogService =
       props.serviceProvider.get<DialogService>("DialogService");
+
+    this.state = {
+      hasError: false,
+    };
+  }
+
+  static getDerivedStateFromError(error: Error): PCFFieldControlState {
+    // Update state so the next render will show the fallback UI
+    return { hasError: true };
   }
 
   render(): React.JSX.Element {
@@ -41,7 +57,9 @@ export class PCFFieldControl extends React.Component<PCFFieldControlProps> {
       optionSetFieldRequired,
       onShowPopup,
     } = this.vm;
-    return (
+    return this.state.hasError ? (
+      <>Fallback UI from error boundary</>
+    ) : (
       <ServiceProviderContext.Provider value={this.props.serviceProvider}>
         <Stack wrap horizontal tokens={{ maxWidth: 400 }}>
           {/* <Stack.Item>
@@ -79,6 +97,7 @@ export class PCFFieldControl extends React.Component<PCFFieldControlProps> {
             onClick={this.vm.onToggleFullScreen}
           ></IconButton>
         </Stack>
+
         {this.vm.isPopupVisible && (
           <Callout
             target={`.${styles.searchButton}`}
