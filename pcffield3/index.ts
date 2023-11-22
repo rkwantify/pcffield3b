@@ -4,6 +4,7 @@ import { PCFFieldControl } from "./components/PCFFieldControl";
 import ReactDOM = require("react-dom");
 import React = require("react");
 import { CompositeControlVM } from "./viewmodels/CompositeControlVM";
+import { DialogService } from "./viewmodels/DialogService";
 
 export class pcffield3 extends StandardControlReact<IInputs, IOutputs> {
   constructor() {
@@ -16,6 +17,7 @@ export class pcffield3 extends StandardControlReact<IInputs, IOutputs> {
         "ViewModel",
         new CompositeControlVM(serviceProvider)
       );
+      serviceProvider.register("DialogService", new DialogService());
     };
 
     this.reactCreateElement = (

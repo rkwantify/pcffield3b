@@ -5,10 +5,11 @@ import {
 } from "pcf-react";
 import { IInputs } from "../generated/ManifestTypes";
 import { action, decorate, observable } from "mobx";
+import { DialogService } from "./DialogService";
 
 export class CompositeControlVM {
-  serviceProvider: ServiceProvider;
-  controlContext: ControlContextService;
+  serviceProvider: ServiceProvider; // from Drurow pcf-react
+  controlContext: ControlContextService; // from Drurow pcf-react
   optionSetFieldOptions:
     | ComponentFramework.PropertyHelper.OptionMetadata[]
     | undefined;
@@ -33,6 +34,7 @@ export class CompositeControlVM {
   onLoad(): void {
     this.optionSetFieldOptions =
       this.controlContext.getParameters<IInputs>().optionSetField.attributes?.Options;
+    console.dir(this.optionSetFieldOptions);
     this.optionSetFieldRequired =
       this.controlContext.getParameters<IInputs>().optionSetField.attributes
         ?.RequiredLevel == 2;
@@ -65,15 +67,40 @@ export class CompositeControlVM {
     });
   }
 
-  onOptionSetFieldChanged(value: number | null): void {
-    this.optionSetField = value;
-    if (value == 0) {
-      this.textField = "Some other value (onOptionSetFieldChanged)";
+  async onOptionSetFieldChanged(value: number | null): Promise<void> {
+    try {
+      this.optionSetField = value;
+      if (value == 0) {
+        // "Other" from `optionSetField.attributes.Options`
+        const response = await this.controlContext.showConfirmDialog({
+          text: "Are you sure? (confirm string)",
+        });
+
+        if (response.confirmed) {
+          this.textField = "(response.confirmed is true)";
+        }
+        // Facebook
+      } else if (value === 1) {
+        // "Facebook"
+        const dialogService =
+          this.serviceProvider.get<DialogService>("DialogService");
+        const response = await dialogService.showDialog(
+          "Confirm",
+          "Are you sure? (PCF context.navigation dialog)"
+        );
+        if (response == "ok") {
+          this.textField = "Facebook";
+          throw new Error("Somethign happened!!!");
+        }
+      }
+
+      this.controlContext.setParameters({
+        optionSetField: value,
+        textField: this.textField,
+      });
+    } catch (ex) {
+      this.controlContext?.showErrorDialog(ex as Error);
     }
-    this.controlContext.setParameters({
-      optionSetField: value,
-      textField: this.textField,
-    });
   }
 
   onShowPopup(): void {

@@ -6,6 +6,8 @@ import { TextInput } from "./pcf-fluent-ui/TextInput";
 import { OptionSetInput } from "./pcf-fluent-ui/OptionSetInput";
 import { ServiceProviderContext } from "./context";
 import { observer } from "mobx-react";
+import { DialogService } from "../viewmodels/DialogService";
+import { DialogView } from "./DialogView";
 
 export interface PCFFieldControlProps {
   controlWidth?: number;
@@ -20,10 +22,13 @@ const styles = mergeStyleSets({
 
 export class PCFFieldControl extends React.Component<PCFFieldControlProps> {
   vm: CompositeControlVM;
+  dialogService: DialogService;
 
   constructor(props: PCFFieldControlProps) {
     super(props);
     this.vm = props.serviceProvider.get<CompositeControlVM>("ViewModel");
+    this.dialogService =
+      props.serviceProvider.get<DialogService>("DialogService");
   }
 
   render(): React.JSX.Element {
@@ -43,7 +48,9 @@ export class PCFFieldControl extends React.Component<PCFFieldControlProps> {
             {this.props.controlWidth} x{" "}
             {this.props.controlHeight ?? "undefined"}``
           </Stack.Item> */}
+
           {/* <Stack.Item>{`isPopupVisible: ${this.vm.isPopupVisible}`}</Stack.Item> */}
+          <Stack.Item>{`optionSetField: ${optionSetField}`}</Stack.Item>
           <Stack.Item grow>
             <TextInput
               value={textField}
@@ -90,6 +97,8 @@ export class PCFFieldControl extends React.Component<PCFFieldControlProps> {
             />
           </Callout>
         )}
+
+        <DialogView />
       </ServiceProviderContext.Provider>
     );
   }
