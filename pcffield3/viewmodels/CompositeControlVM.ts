@@ -6,6 +6,7 @@ import {
 import { IInputs } from "../generated/ManifestTypes";
 import { action, decorate, observable } from "mobx";
 import { DialogService } from "./DialogService";
+import { CdsService } from "../cdsservice/CdsService";
 
 export class CompositeControlVM {
   serviceProvider: ServiceProvider; // from Drurow pcf-react
@@ -84,6 +85,12 @@ export class CompositeControlVM {
         // "Facebook"
         const dialogService =
           this.serviceProvider.get<DialogService>("DialogService");
+
+        const cdsService = this.serviceProvider.get<CdsService>("CdsService");
+        const existingRecord = cdsService.getRecordById(
+          this.controlContext.getPrimaryId().id
+        );
+
         const response = await dialogService.showDialog(
           "Confirm",
           "Are you sure? (PCF context.navigation dialog)"
