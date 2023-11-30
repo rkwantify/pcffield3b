@@ -1,16 +1,14 @@
 import {
+  ServiceProvider,
   ControlContextService,
   ParametersChangedEventArgs,
-  ServiceProvider,
 } from "pcf-react";
 import { IInputs } from "../generated/ManifestTypes";
-import { action, decorate, observable } from "mobx";
+import { decorate, observable, action } from "mobx";
 import { DialogService } from "./DialogService";
-import { CdsService } from "../cdsservice/CdsService";
-
 export class CompositeControlVM {
-  serviceProvider: ServiceProvider; // from Drurow pcf-react
-  controlContext: ControlContextService; // from Drurow pcf-react
+  serviceProvider: ServiceProvider;
+  controlContext: ControlContextService;
   optionSetFieldOptions:
     | ComponentFramework.PropertyHelper.OptionMetadata[]
     | undefined;
@@ -30,25 +28,20 @@ export class CompositeControlVM {
       this.onInParametersChanged
     );
   }
-
-  // #region Actions
   onLoad(): void {
+    this.controlContext.onFullScreenModeChangedEvent.subscribe(
+      this.onFullScreenChanged
+    );
     this.optionSetFieldOptions =
       this.controlContext.getParameters<IInputs>().optionSetField.attributes?.Options;
-    console.dir(this.optionSetFieldOptions);
     this.optionSetFieldRequired =
       this.controlContext.getParameters<IInputs>().optionSetField.attributes
         ?.RequiredLevel == 2;
-
-    this.controlContext.onFullScreenModeChangedEvent.subscribe(
-      this.onToggleFullScreen
-    );
   }
-
   onInParametersChanged(
     context: ControlContextService,
     args: ParametersChangedEventArgs
-  ) {
+  ): void {
     for (const param of args.updated) {
       switch (param) {
         case "textField":
@@ -56,7 +49,6 @@ export class CompositeControlVM {
           break;
         case "optionSetField":
           this.optionSetField = args.values[param] as number | null;
-          break;
       }
     }
   }
@@ -67,37 +59,25 @@ export class CompositeControlVM {
       textField: value,
     });
   }
-
   async onOptionSetFieldChanged(value: number | null): Promise<void> {
     try {
       this.optionSetField = value;
       if (value == 0) {
-        // "Other" from `optionSetField.attributes.Options`
         const response = await this.controlContext.showConfirmDialog({
-          text: "Are you sure? (confirm string)",
+          text: "Are you sure?",
         });
-
         if (response.confirmed) {
-          this.textField = "(response.confirmed is true)";
+          this.textField = "Other";
         }
-        // Facebook
-      } else if (value === 1) {
-        // "Facebook"
+      } else if (value == 1) {
         const dialogService =
           this.serviceProvider.get<DialogService>("DialogService");
-
-        const cdsService = this.serviceProvider.get<CdsService>("CdsService");
-        const existingRecord = cdsService.getRecordById(
-          this.controlContext.getPrimaryId().id
-        );
-
         const response = await dialogService.showDialog(
           "Confirm",
-          "Are you sure? (PCF context.navigation dialog)"
+          "Are you sure?"
         );
         if (response == "ok") {
           this.textField = "Facebook";
-          throw new Error("Somethign happened!!!");
         }
       }
 
@@ -106,19 +86,16 @@ export class CompositeControlVM {
         textField: this.textField,
       });
     } catch (ex) {
-      this.controlContext?.showErrorDialog(ex as Error);
+      this.controlContext.showErrorDialog(ex as Error);
     }
   }
 
   onShowPopup(): void {
     this.isPopupVisible = true;
-    console.log("onShowPopup");
   }
   onDismissPopup(): void {
-    console.log("onDismissPopup");
     this.isPopupVisible = false;
   }
-
   onToggleFullScreen(): void {
     this.isPopupVisible = false;
     this.isFullScreen = !this.isFullScreen;
@@ -130,17 +107,16 @@ export class CompositeControlVM {
   ): void {
     this.isFullScreen = fullscreen;
   }
-  // #endregion
 }
 
 decorate(CompositeControlVM, {
   textField: observable,
   optionSetField: observable,
-  isPopupVisible: observable,
   onLoad: action.bound,
   onOptionSetFieldChanged: action.bound,
   onTextFieldChanged: action.bound,
   onInParametersChanged: action.bound,
+  isPopupVisible: observable,
   onShowPopup: action.bound,
   onDismissPopup: action.bound,
   isFullScreen: observable,

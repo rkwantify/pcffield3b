@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <manifest>
-  <control namespace="propcf" constructor="pcffield3" version="0.0.6" display-name-key="pcffield3" description-key="pcffield3 description" control-type="standard" >
+  <control namespace="propcf" constructor="pcffield3" version="0.0.7" display-name-key="pcffield3" description-key="pcffield3 description" control-type="standard" >
     <type-group name="strings">
       <type>SingleLine.Text</type>
       <type>SingleLine.Email</type>

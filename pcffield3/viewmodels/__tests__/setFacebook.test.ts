@@ -8,15 +8,10 @@ test("setFacebook", async () => {
   const dialogService = new DialogService();
 
   controlContext.setParameters = jest.fn();
-  serviceProvider.register(
-    ControlContextService.serviceProviderName,
-    controlContext
-  );
+  serviceProvider.register(ControlContextService.serviceProviderName, controlContext);
   serviceProvider.register("DialogService", dialogService);
 
   dialogService.showDialog = jest.fn().mockReturnValue("ok");
-  controlContext.showErrorDialog = jest.fn();
-
   const vm = new CompositeControlVM(serviceProvider);
 
   await vm.onOptionSetFieldChanged(1);

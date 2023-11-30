@@ -14,14 +14,13 @@ export class DialogView extends React.Component {
   render(): React.JSX.Element {
     const dialogService = this.context.get<DialogService>("DialogService");
     if (dialogService.isOpen) {
-      // simulate React component crashing
-      throw new Error("Render crash - simulate crash for Error Boundary");
+      throw new Error("Render crash");
     }
     return (
       <Dialog
         dialogContentProps={{
           type: DialogType.normal,
-          title: `${dialogService.title} (fluent-ui dialog)`,
+          title: dialogService.title,
           closeButtonAriaLabel: "Close",
           subText: dialogService.message,
         }}

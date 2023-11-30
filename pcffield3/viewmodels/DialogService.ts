@@ -1,13 +1,10 @@
 import { observable, decorate, action } from "mobx";
-
 export type DialogServiceResult = "ok" | "cancel";
-
 export class DialogService {
   isOpen = false;
   message = "";
   title = "";
   showDialogCallback: (result: DialogServiceResult) => void;
-
   showDialog(title: string, message: string): Promise<DialogServiceResult> {
     this.title = title;
     this.message = message;
@@ -17,7 +14,6 @@ export class DialogService {
       this.showDialogCallback = resolve;
     });
   }
-
   onOkClicked(): void {
     this.isOpen = false;
     this.showDialogCallback("ok");

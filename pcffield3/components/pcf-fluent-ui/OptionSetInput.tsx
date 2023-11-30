@@ -1,10 +1,6 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import * as React from "react";
-import {
-  Dropdown,
-  IDropdownOption,
-  IDropdownProps,
-} from "office-ui-fabric-react/lib/Dropdown";
+import { Dropdown, IDropdownOption, IDropdownProps } from "office-ui-fabric-react/lib/Dropdown";
 
 export interface OptionSetProps {
   value: number | null;
@@ -21,11 +17,7 @@ export class OptionSetInput extends React.Component<OptionSetProps> {
     super(props);
   }
 
-  onChange = (
-    event: React.FormEvent<HTMLDivElement>,
-    item: IDropdownOption | undefined
-  ): void => {
-    // const selectedKey = item?.key == null ? -1 : 0;
+  onChange = (event: React.FormEvent<HTMLDivElement>, item: IDropdownOption | undefined): void => {
     const selectedKey = item?.key == null ? -1 : (item.key as number);
     this.props.onChange(selectedKey != -1 ? selectedKey : null);
   };
@@ -44,12 +36,8 @@ export class OptionSetInput extends React.Component<OptionSetProps> {
       [];
 
     if (showBlank) {
-      dropDownOptions = [
-        { key: -1, text: blankTextLabel } as IDropdownOption,
-      ].concat(dropDownOptions);
+      dropDownOptions = [{ key: -1, text: blankTextLabel } as IDropdownOption].concat(dropDownOptions);
     }
-
-    console.log("hi");
     const selectedValue = value == null ? -1 : value;
     return (
       <Dropdown

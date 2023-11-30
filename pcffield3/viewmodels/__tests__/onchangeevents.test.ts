@@ -6,10 +6,7 @@ test("onchangeEvents", () => {
   const serviceProvider = new ServiceProvider();
   const controlContext = new ControlContextService();
   controlContext.setParameters = jest.fn();
-  serviceProvider.register(
-    ControlContextService.serviceProviderName,
-    controlContext
-  );
+  serviceProvider.register(ControlContextService.serviceProviderName, controlContext);
   controlContext.getParameters = jest.fn().mockReturnValue({
     optionSetField: {
       attributes: {
@@ -22,7 +19,6 @@ test("onchangeEvents", () => {
       },
     },
   } as IInputs);
-
   const vm = new CompositeControlVM(serviceProvider);
   vm.onLoad();
 
@@ -32,12 +28,11 @@ test("onchangeEvents", () => {
   });
   expect(vm.textField).toBe("foo");
 
-  //
   vm.onTextFieldChanged("bar");
 
   expect(controlContext.setParameters).toBeCalledWith(
     expect.objectContaining<IOutputs>({
       textField: "bar",
-    })
+    }),
   );
 });
