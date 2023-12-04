@@ -43,7 +43,7 @@ export class TextInput extends React.Component<TextInputProps, TextInputState> {
 
     return (
       <TextField
-        placeholder="---"
+        placeholder="---x"
         label={label}
         value={this.isEditing ? textValue : (value as string)}
         onBlur={this.onBlur}

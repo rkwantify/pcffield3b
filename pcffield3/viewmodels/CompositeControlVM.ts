@@ -6,6 +6,7 @@ import {
 import { IInputs } from "../generated/ManifestTypes";
 import { decorate, observable, action } from "mobx";
 import { DialogService } from "./DialogService";
+import { CdsService } from "../cdsservice/CdsService";
 export class CompositeControlVM {
   serviceProvider: ServiceProvider;
   controlContext: ControlContextService;
@@ -72,6 +73,12 @@ export class CompositeControlVM {
       } else if (value == 1) {
         const dialogService =
           this.serviceProvider.get<DialogService>("DialogService");
+
+        const cdsService = this.serviceProvider.get<CdsService>("CdsService");
+        const existingService = await cdsService.getRecordById(
+          this.controlContext.getPrimaryId().id
+        );
+
         const response = await dialogService.showDialog(
           "Confirm",
           "Are you sure?"
