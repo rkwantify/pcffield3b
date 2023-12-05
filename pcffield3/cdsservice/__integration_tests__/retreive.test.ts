@@ -1,3 +1,23 @@
+import { SetupGlobalContext } from "cdsify/lib/cdsnode";
+
+test("retrieve", async () => {
+    await SetupGlobalContext();
+
+    const fetch = `<fetch version="1.0" output-format="xml-platform" mapping="logical" distinct="false">
+        <entity name="pcf_pcftesterentity">
+            <all-attributes />
+        </entity>
+    </fetch>`;
+
+    const response = await Xrm.WebApi.retrieveMultipleRecords(
+      "pcf_pcftesterentity",
+      "?fetchXml=" + encodeURIComponent(fetch),
+    );
+    console.log(response.entities[0]); 
+});
+
+
+
 // /* eslint-disable camelcase */
 // /* eslint-disable @typescript-eslint/camelcase */
 // import { SetupGlobalContext } from "cdsify/lib/cdsnode";

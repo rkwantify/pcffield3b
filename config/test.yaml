@@ -1,0 +1,5 @@
+# Configuration file for the XrmNode Unit tests
+nodecds:
+ server:
+  host: https://rktest1.crm.dynamics.com
+  version: 9.1
